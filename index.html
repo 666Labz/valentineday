@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Buku Valentine</title>
 
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
@@ -23,7 +23,7 @@ body{
 h1{
     color:#ff7aa2;
     margin:6px;
-    font-size:18px;
+    font-size:16px;
     text-shadow:0 0 10px rgba(255,120,170,.7);
 }
 
@@ -34,22 +34,15 @@ button{
     padding:6px 18px;
     border-radius:20px;
     cursor:pointer;
-    margin-bottom:8px;
+    margin-bottom:6px;
     font-size:12px;
     box-shadow:0 0 15px rgba(255,100,150,.6);
 }
 
+/* ukuran PAS HP */
 #book{
-    width:min(90vw,600px);
-    height:min(55vh,420px);
-    animation:openBook 1.5s ease forwards;
-    filter:drop-shadow(0 0 18px rgba(255,120,170,.6));
-}
-
-/* opening animation */
-@keyframes openBook{
-    from{transform:scale(.85) rotateX(20deg);opacity:0}
-    to{transform:scale(1) rotateX(0);opacity:1}
+    width:92vw;
+    height:52vh;
 }
 
 /* halaman */
@@ -77,22 +70,13 @@ button{
 .flower{
     position:fixed;
     top:-40px;
-    font-size:18px;
+    font-size:16px;
     animation:fall linear forwards;
     pointer-events:none;
 }
 
 @keyframes fall{
     to{transform:translateY(110vh) rotate(360deg);opacity:0}
-}
-
-/* HP */
-@media(max-width:480px){
-    #book{
-        width:94vw;
-        height:45vh;
-    }
-    h1{font-size:16px}
 }
 </style>
 </head>
@@ -123,15 +107,16 @@ spreads.forEach(src=>{
 
 pages.push("cover-belakang.jpg");
 
+/* ukuran engine flip disesuaikan HP */
 const book=new St.PageFlip(
     document.getElementById("book"),
     {
-        width:300,
-        height:420,
+        width:280,
+        height:400,
         showCover:true,
         size:"fixed",
-        flippingTime:1000,
-        maxShadowOpacity:0.6,
+        flippingTime:900,
+        maxShadowOpacity:0.5,
         useMouseEvents:true,
         mobileScrollSupport:true
     }
@@ -168,7 +153,7 @@ setInterval(()=>{
     flower.style.animationDuration=(3+Math.random()*3)+"s";
     document.body.appendChild(flower);
     setTimeout(()=>flower.remove(),6000);
-},550);
+},650);
 
 /* musik */
 let play=false;
