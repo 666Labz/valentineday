@@ -6,66 +6,74 @@
 <title>Buku Valentine</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
 <style>
 body{
     margin:0;
     background:radial-gradient(circle at top,#2a0a14,#000);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    min-height:100vh;
-    overflow:hidden;
     font-family:Poppins,sans-serif;
-    padding-top:14px;
+    color:white;
+}
+
+/* HEADER */
+.header{
+    text-align:center;
+    padding:26px 10px 10px;
 }
 
 h1{
     font-family:'Great Vibes',cursive;
-    font-size:30px;
+    font-size:38px;
     color:#ff9fc4;
-    margin:6px 0 4px;
+    margin:0 0 14px;
     text-shadow:
         0 0 6px rgba(255,140,180,.6),
-        0 0 14px rgba(255,80,140,.5);
+        0 0 16px rgba(255,80,140,.6);
 }
 
 button{
     background:linear-gradient(45deg,#ff4d6d,#ff85a1);
     color:white;
     border:none;
-    padding:6px 18px;
-    border-radius:20px;
+    padding:10px 26px;
+    border-radius:30px;
     cursor:pointer;
-    margin-bottom:10px;
-    font-size:12px;
-    box-shadow:0 0 12px rgba(255,100,150,.6);
+    font-size:14px;
+    box-shadow:0 0 14px rgba(255,100,150,.7);
 }
 
-#wrap{
-    width:100%;
+/* SPACE */
+.spacer{
+    height:70px;
+}
+
+/* AREA BUKU */
+.book-wrap{
     display:flex;
     justify-content:center;
-    align-items:center;
+    padding-bottom:80px;
+    position:relative;
 }
 
+/* UKURAN BUKU */
 #book{
-    width:360px;
-    height:520px;
-    transform-origin:top center;
+    width:260px;
+    height:390px;
+    touch-action: pan-y;
+    transition:transform .25s ease;
 }
 
-/* scaling HP */
+/* HP */
 @media(max-width:480px){
+    h1{font-size:34px;}
     #book{
-        transform:scale(0.8);
+        width:240px;
+        height:360px;
     }
 }
 
-/* halaman */
+/* HALAMAN */
 .page{
     background:white;
     overflow:hidden;
@@ -84,28 +92,47 @@ button{
 .left img{transform:translateX(0)}
 .right img{transform:translateX(-50%)}
 
-/* bunga */
-.flower{
+/* ZOOM BUTTON */
+.zoom-controls{
     position:fixed;
-    top:-40px;
-    font-size:16px;
-    animation:fall linear forwards;
-    pointer-events:none;
+    bottom:20px;
+    right:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:999;
 }
 
-@keyframes fall{
-    to{transform:translateY(110vh) rotate(360deg);opacity:0}
+.zoom-controls button{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(45deg,#ff4d6d,#ff85a1);
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    box-shadow:0 0 12px rgba(255,100,150,.6);
 }
 </style>
 </head>
 
 <body>
 
-<h1>Happy Valentine Sayang</h1>
-<button onclick="toggleMusic()">▶ Play Music</button>
+<div class="header">
+    <h1>Happy Valentine Sayang ❤️</h1>
+    <button onclick="toggleMusic()">▶ Play Music</button>
+</div>
 
-<div id="wrap">
+<div class="spacer"></div>
+
+<div class="book-wrap">
     <div id="book"></div>
+</div>
+
+<div class="zoom-controls">
+    <button onclick="zoomOut()">➖</button>
+    <button onclick="zoomIn()">➕</button>
 </div>
 
 <audio id="music" src="music.mp3" loop></audio>
@@ -128,58 +155,41 @@ spreads.forEach(src=>{
 
 pages.push("cover-belakang.jpg");
 
-let book;
+const book=new St.PageFlip(
+    document.getElementById("book"),
+    {
+        width:260,
+        height:390,
+        showCover:true,
+        size:"fixed",
+        flippingTime:900,
+        maxShadowOpacity:0.5,
+        useMouseEvents:true,
+        mobileScrollSupport:true
+    }
+);
 
-/* INIT DELAY → BIAR LAYOUT SIAP */
-setTimeout(()=>{
+const elements=pages.map(p=>{
+    const div=document.createElement("div");
+    div.className="page";
 
-    book=new St.PageFlip(
-        document.getElementById("book"),
-        {
-            width:360,
-            height:520,
-            showCover:true,
-            size:"fixed",
-            flippingTime:900,
-            maxShadowOpacity:0.6,
-            useMouseEvents:true,
-            mobileScrollSupport:true
-        }
-    );
+    if(typeof p==="string"){
+        div.innerHTML=`<img src="${p}" style="width:100%">`;
+    }else{
+        div.classList.add(p.side);
+        div.innerHTML=`<img src="${p.src}">`;
+    }
+    return div;
+});
 
-    const elements=pages.map(p=>{
-        const div=document.createElement("div");
-        div.className="page";
+book.loadFromHTML(elements);
 
-        if(typeof p==="string"){
-            div.innerHTML=`<img src="${p}" style="width:100%">`;
-        }else{
-            div.classList.add(p.side);
-            div.innerHTML=`<img src="${p.src}">`;
-        }
-        return div;
-    });
-
-    book.loadFromHTML(elements);
-
-    const flipSound=document.getElementById("flip");
-    book.on("flip",()=>{
-        flipSound.currentTime=0;
-        flipSound.play();
-    });
-
-},120);
-
-/* bunga */
-setInterval(()=>{
-    const flower=document.createElement("div");
-    flower.className="flower";
-    flower.innerHTML=["🌸","🌺","🌷","💮"][Math.floor(Math.random()*4)];
-    flower.style.left=Math.random()*window.innerWidth+"px";
-    flower.style.animationDuration=(3+Math.random()*3)+"s";
-    document.body.appendChild(flower);
-    setTimeout(()=>flower.remove(),6000);
-},800);
+/* suara kertas */
+const flipSound=document.getElementById("flip");
+book.on("flip",()=>{
+    flipSound.currentTime=0;
+    flipSound.play();
+});
 
 /* musik */
 let play=false;
@@ -187,6 +197,21 @@ function toggleMusic(){
     const m=document.getElementById("music");
     play=!play;
     play?m.play():m.pause();
+}
+
+/* ZOOM CONTROL */
+let scale=1;
+
+function zoomIn(){
+    scale+=0.1;
+    if(scale>1.5) scale=1.5;
+    document.getElementById("book").style.transform=`scale(${scale})`;
+}
+
+function zoomOut(){
+    scale-=0.1;
+    if(scale<0.7) scale=0.7;
+    document.getElementById("book").style.transform=`scale(${scale})`;
 }
 </script>
 
