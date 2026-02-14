@@ -2,8 +2,10 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Buku Valentine</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
@@ -14,16 +16,21 @@ body{
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:center;
+    justify-content:flex-start;
     min-height:100vh;
     overflow:hidden;
-    font-family:Segoe UI,sans-serif;
+    font-family:Poppins,sans-serif;
+    padding-top:14px;
 }
 
 h1{
-    color:#ff7aa2;
-    margin:6px;
-    font-size:18px;
+    font-family:'Great Vibes',cursive;
+    font-size:30px;
+    color:#ff9fc4;
+    margin:6px 0 4px;
+    text-shadow:
+        0 0 6px rgba(255,140,180,.6),
+        0 0 14px rgba(255,80,140,.5);
 }
 
 button{
@@ -33,29 +40,38 @@ button{
     padding:6px 18px;
     border-radius:20px;
     cursor:pointer;
-    margin-bottom:8px;
+    margin-bottom:10px;
     font-size:12px;
+    box-shadow:0 0 12px rgba(255,100,150,.6);
 }
 
 #wrap{
     width:100%;
     display:flex;
     justify-content:center;
+    align-items:center;
 }
 
 #book{
-    width:90vw;
-    max-width:720px;
-    height:60vh;
-    max-height:520px;
+    width:360px;
+    height:520px;
+    transform-origin:top center;
 }
 
+/* scaling HP */
+@media(max-width:480px){
+    #book{
+        transform:scale(0.8);
+    }
+}
+
+/* halaman */
 .page{
     background:white;
     overflow:hidden;
-    border-radius:8px;
+    border-radius:10px;
     box-shadow:
-        inset 0 0 8px rgba(0,0,0,.15),
+        inset 0 0 10px rgba(0,0,0,.15),
         0 6px 18px rgba(255,120,170,.45);
 }
 
@@ -68,6 +84,7 @@ button{
 .left img{transform:translateX(0)}
 .right img{transform:translateX(-50%)}
 
+/* bunga */
 .flower{
     position:fixed;
     top:-40px;
@@ -79,20 +96,12 @@ button{
 @keyframes fall{
     to{transform:translateY(110vh) rotate(360deg);opacity:0}
 }
-
-@media(max-width:480px){
-    #book{
-        width:95vw;
-        height:50vh;
-    }
-    h1{font-size:16px}
-}
 </style>
 </head>
 
 <body>
 
-<h1>Happy Valentine Sayang ❤️</h1>
+<h1>Happy Valentine Sayang</h1>
 <button onclick="toggleMusic()">▶ Play Music</button>
 
 <div id="wrap">
@@ -119,41 +128,49 @@ spreads.forEach(src=>{
 
 pages.push("cover-belakang.jpg");
 
-const book=new St.PageFlip(
-    document.getElementById("book"),
-    {
-        width:360,
-        height:520,
-        showCover:true,
-        size:"fixed",
-        flippingTime:900,
-        maxShadowOpacity:0.5,
-        useMouseEvents:true,
-        mobileScrollSupport:true
-    }
-);
+let book;
 
-const elements=pages.map(p=>{
-    const div=document.createElement("div");
-    div.className="page";
+/* INIT DELAY → BIAR LAYOUT SIAP */
+setTimeout(()=>{
 
-    if(typeof p==="string"){
-        div.innerHTML=`<img src="${p}" style="width:100%">`;
-    }else{
-        div.classList.add(p.side);
-        div.innerHTML=`<img src="${p.src}">`;
-    }
-    return div;
-});
+    book=new St.PageFlip(
+        document.getElementById("book"),
+        {
+            width:360,
+            height:520,
+            showCover:true,
+            size:"fixed",
+            flippingTime:900,
+            maxShadowOpacity:0.6,
+            useMouseEvents:true,
+            mobileScrollSupport:true
+        }
+    );
 
-book.loadFromHTML(elements);
+    const elements=pages.map(p=>{
+        const div=document.createElement("div");
+        div.className="page";
 
-const flipSound=document.getElementById("flip");
-book.on("flip",()=>{
-    flipSound.currentTime=0;
-    flipSound.play();
-});
+        if(typeof p==="string"){
+            div.innerHTML=`<img src="${p}" style="width:100%">`;
+        }else{
+            div.classList.add(p.side);
+            div.innerHTML=`<img src="${p.src}">`;
+        }
+        return div;
+    });
 
+    book.loadFromHTML(elements);
+
+    const flipSound=document.getElementById("flip");
+    book.on("flip",()=>{
+        flipSound.currentTime=0;
+        flipSound.play();
+    });
+
+},120);
+
+/* bunga */
 setInterval(()=>{
     const flower=document.createElement("div");
     flower.className="flower";
@@ -162,8 +179,9 @@ setInterval(()=>{
     flower.style.animationDuration=(3+Math.random()*3)+"s";
     document.body.appendChild(flower);
     setTimeout(()=>flower.remove(),6000);
-},700);
+},800);
 
+/* musik */
 let play=false;
 function toggleMusic(){
     const m=document.getElementById("music");
