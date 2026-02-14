@@ -10,46 +10,56 @@
 <style>
 body{
     margin:0;
-    background:radial-gradient(circle,#222,#000);
+    background:radial-gradient(circle at top,#2a0a14,#000);
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    height:100vh;
+    min-height:100vh;
     overflow:hidden;
     font-family:Segoe UI,sans-serif;
 }
 
 h1{
-    color:#ff4d6d;
-    margin:5px;
+    color:#ff7aa2;
+    margin:6px;
+    font-size:18px;
+    text-shadow:0 0 10px rgba(255,120,170,.7);
 }
 
 button{
-    background:#ff4d6d;
+    background:linear-gradient(45deg,#ff4d6d,#ff85a1);
     color:white;
     border:none;
-    padding:8px 22px;
-    border-radius:25px;
+    padding:6px 18px;
+    border-radius:20px;
     cursor:pointer;
-    margin-bottom:10px;
-    font-size:14px;
+    margin-bottom:8px;
+    font-size:12px;
+    box-shadow:0 0 15px rgba(255,100,150,.6);
 }
 
-/* ukuran buku diperkecil */
 #book{
-    width:720px;
-    height:520px;
+    width:min(90vw,600px);
+    height:min(55vh,420px);
+    animation:openBook 1.5s ease forwards;
+    filter:drop-shadow(0 0 18px rgba(255,120,170,.6));
+}
+
+/* opening animation */
+@keyframes openBook{
+    from{transform:scale(.85) rotateX(20deg);opacity:0}
+    to{transform:scale(1) rotateX(0);opacity:1}
 }
 
 /* halaman */
 .page{
     background:white;
     overflow:hidden;
-    border-radius:7px;
+    border-radius:8px;
     box-shadow:
         inset 0 0 8px rgba(0,0,0,.15),
-        0 6px 18px rgba(0,0,0,.3);
+        0 6px 18px rgba(255,120,170,.45);
 }
 
 /* gambar */
@@ -59,9 +69,31 @@ button{
     object-fit:cover;
 }
 
-/* potong kiri kanan dari 1 gambar horizontal */
+/* potong kiri kanan */
 .left img{transform:translateX(0)}
 .right img{transform:translateX(-50%)}
+
+/* bunga jatuh */
+.flower{
+    position:fixed;
+    top:-40px;
+    font-size:18px;
+    animation:fall linear forwards;
+    pointer-events:none;
+}
+
+@keyframes fall{
+    to{transform:translateY(110vh) rotate(360deg);opacity:0}
+}
+
+/* HP */
+@media(max-width:480px){
+    #book{
+        width:94vw;
+        height:45vh;
+    }
+    h1{font-size:16px}
+}
 </style>
 </head>
 
@@ -73,6 +105,7 @@ button{
 <div id="book"></div>
 
 <audio id="music" src="music.mp3" loop></audio>
+<audio id="flip" src="flip.mp3"></audio>
 
 <script>
 const spreads=[
@@ -93,11 +126,11 @@ pages.push("cover-belakang.jpg");
 const book=new St.PageFlip(
     document.getElementById("book"),
     {
-        width:360,
-        height:520,
+        width:300,
+        height:420,
         showCover:true,
         size:"fixed",
-        flippingTime:900,
+        flippingTime:1000,
         maxShadowOpacity:0.6,
         useMouseEvents:true,
         mobileScrollSupport:true
@@ -119,6 +152,25 @@ const elements=pages.map(p=>{
 
 book.loadFromHTML(elements);
 
+/* suara kertas */
+const flipSound=document.getElementById("flip");
+book.on("flip",()=>{
+    flipSound.currentTime=0;
+    flipSound.play();
+});
+
+/* hujan bunga */
+setInterval(()=>{
+    const flower=document.createElement("div");
+    flower.className="flower";
+    flower.innerHTML=["🌸","🌺","🌷","💮"][Math.floor(Math.random()*4)];
+    flower.style.left=Math.random()*window.innerWidth+"px";
+    flower.style.animationDuration=(3+Math.random()*3)+"s";
+    document.body.appendChild(flower);
+    setTimeout(()=>flower.remove(),6000);
+},550);
+
+/* musik */
 let play=false;
 function toggleMusic(){
     const m=document.getElementById("music");
